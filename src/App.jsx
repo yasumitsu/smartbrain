@@ -4,10 +4,12 @@ import Logo from './components/Logo/Logo';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 import Rank from './components/Rank/Rank';
+import Guess from './components/Guess/Guess.jsx';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Particles from 'react-particles-js';
 import Clarifai from 'clarifai';
+import axios from 'axios';
 import { Component } from 'react';
 
 const app = new Clarifai.App({
@@ -32,7 +34,9 @@ class App extends Component {
 			imageUrl: '',
 			box: {},
 			route: 'signin',
-			isSignedIn: false
+			isSignedIn: false,
+			celebrity: '',
+			celebrityUrl: ''
 		};
 	}
 
@@ -50,7 +54,7 @@ class App extends Component {
 	};
 
 	displayFaceBox = (box) => {
-		this.setState({ box: box });
+		this.setState({ box });
 	};
 
 	onInputChange = (event) => {
@@ -61,6 +65,7 @@ class App extends Component {
 		this.setState({
 			imageUrl: this.state.input
 		});
+
 		app.models
 			.predict(Clarifai.CELEBRITY_MODEL, this.state.input)
 			.then((response) => {
@@ -68,7 +73,26 @@ class App extends Component {
 				// this.calculateCelebrity(response);
 				// console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
 				// console.log(response.outputs[0].data.regions[0].data.concepts[0].value);
-				// console.log(response.outputs[0].data.regions[0].data.concepts[0].name);
+				this.setState({ celebrity: response.outputs[0].data.regions[0].data.concepts[0].name });
+				const options = {
+					method: 'GET',
+					url: 'https://contextualwebsearch-websearch-v1.p.rapidapi.com/api/Search/ImageSearchAPI',
+					params: { q: this.state.celebrity, pageNumber: '1', pageSize: '1', autoCorrect: 'true' },
+					headers: {
+						'x-rapidapi-host': 'contextualwebsearch-websearch-v1.p.rapidapi.com',
+						'x-rapidapi-key': 'eacdada91amshc767ae517ce85d5p1a7e68jsn0e01cc5e5541'
+					}
+				};
+
+				axios
+					.request(options)
+					.then((response) => {
+						console.log(this.state.celebrity);
+						this.setState({ celebrityUrl: response.data.value[0].url });
+					})
+					.catch((error) => {
+						console.error(error);
+					});
 			})
 			.catch((err) => {
 				console.log(err);
@@ -91,6 +115,7 @@ class App extends Component {
 					<div>
 						<Logo />
 						<Rank />
+						<Guess celebrity={this.state.celebrity} celebrityUrl={this.state.celebrityUrl} />
 						<ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
 						<FaceRecognition box={box} imageUrl={imageUrl} />
 					</div>
