@@ -36,9 +36,30 @@ class App extends Component {
 			route: 'signin',
 			isSignedIn: false,
 			celebrity: '',
-			celebrityUrl: ''
+			celebrityUrl: '',
+			user: {
+				id: '',
+				name: '',
+				email: '',
+				password: '',
+				entries: 0,
+				joined: ''
+			}
 		};
 	}
+
+	loadUser = (data) => {
+		this.setState({
+			user: {
+				id: data.id,
+				name: data.name,
+				email: data.email,
+				password: data.password,
+				entries: data.entries,
+				joined: data.joined
+			}
+		});
+	};
 
 	calculateFaceLocation = (data) => {
 		const clarifaiFacePosition = data.outputs[0].data.regions[0].region_info.bounding_box;
@@ -100,11 +121,13 @@ class App extends Component {
 	};
 
 	onRouteChange = (route) => {
-		if (route === 'signout') this.setState({ isSignedIn: false });
-		else if ((route = 'home')) this.setState({ isSignedIn: true });
-		this.setState({ route });
+		if (route === 'signout') {
+			this.setState({ isSignedIn: false });
+		} else if (route === 'home') {
+			this.setState({ isSignedIn: true });
+		}
+		this.setState({ route: route });
 	};
-
 	render() {
 		const { isSignedIn, imageUrl, route, box } = this.state;
 		return (
@@ -114,15 +137,15 @@ class App extends Component {
 				{route === 'home' ? (
 					<div>
 						<Logo />
-						<Rank />
-						<Guess celebrity={this.state.celebrity} celebrityUrl={this.state.celebrityUrl} />
+						<Rank name={this.state.user.name} entries={this.state.user.entries} />
+						<Guess celebrity={this.state.celebrity} celebrityUrl={this.state.celebrityUrl} />;
 						<ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
 						<FaceRecognition box={box} imageUrl={imageUrl} />
 					</div>
 				) : route === 'signin' ? (
-					<Signin onRouteChange={this.onRouteChange} />
+					<Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
 				) : (
-					<Register onRouteChange={this.onRouteChange} />
+					<Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
 				)}
 			</div>
 		);
