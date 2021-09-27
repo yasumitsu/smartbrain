@@ -1,13 +1,15 @@
 import React from 'react';
 
 const Guess = ({ celebrity, celebrityUrl }) => {
-	return (
+	return celebrity ? (
 		<div className="center ma">
 			<div className=" mt2">
-				<div className="white f3">{`Kenji, your celebrity is ${celebrity}`}</div>
+				<div className="white f3 mb3">{` your celebrity is ${celebrity}`}</div>
 				<img width="500px" height="auto" src={celebrityUrl} />
 			</div>
 		</div>
+	) : (
+		<div />
 	);
 };
 

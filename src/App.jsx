@@ -54,7 +54,6 @@ class App extends Component {
 				id: data.id,
 				name: data.name,
 				email: data.email,
-				password: data.password,
 				entries: data.entries,
 				joined: data.joined
 			}
@@ -90,6 +89,19 @@ class App extends Component {
 		app.models
 			.predict(Clarifai.CELEBRITY_MODEL, this.state.input)
 			.then((response) => {
+				if (response) {
+					fetch('http://localhost:3000/image', {
+						method: 'put',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							id: this.state.user.id
+						})
+					})
+						.then((response) => response.json())
+						.then((count) => {
+							this.setState(Object.assign(this.state.user, { entries: count }));
+						});
+				}
 				this.displayFaceBox(this.calculateFaceLocation(response));
 				// this.calculateCelebrity(response);
 				// console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
@@ -138,7 +150,7 @@ class App extends Component {
 					<div>
 						<Logo />
 						<Rank name={this.state.user.name} entries={this.state.user.entries} />
-						<Guess celebrity={this.state.celebrity} celebrityUrl={this.state.celebrityUrl} />;
+						<Guess celebrity={this.state.celebrity} celebrityUrl={this.state.celebrityUrl} />
 						<ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
 						<FaceRecognition box={box} imageUrl={imageUrl} />
 					</div>
