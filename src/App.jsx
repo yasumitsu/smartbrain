@@ -8,13 +8,8 @@ import Guess from './components/Guess/Guess.jsx';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
 import axios from 'axios';
 import { Component } from 'react';
-
-const app = new Clarifai.App({
-	apiKey: '922c6f0ec67c49d6878b51c1bd308f19'
-});
 
 const particleOptions = {
 	number: {
@@ -26,26 +21,28 @@ const particleOptions = {
 	}
 };
 
+const initialState = {
+	input: '',
+	imageUrl: '',
+	box: {},
+	route: 'signin',
+	isSignedIn: false,
+	celebrity: '',
+	celebrityUrl: '',
+	user: {
+		id: '',
+		name: '',
+		email: '',
+		password: '',
+		entries: 0,
+		joined: ''
+	}
+};
+
 class App extends Component {
 	constructor() {
 		super();
-		this.state = {
-			input: '',
-			imageUrl: '',
-			box: {},
-			route: 'signin',
-			isSignedIn: false,
-			celebrity: '',
-			celebrityUrl: '',
-			user: {
-				id: '',
-				name: '',
-				email: '',
-				password: '',
-				entries: 0,
-				joined: ''
-			}
-		};
+		this.state = initialState;
 	}
 
 	loadUser = (data) => {
@@ -86,8 +83,14 @@ class App extends Component {
 			imageUrl: this.state.input
 		});
 
-		app.models
-			.predict(Clarifai.CELEBRITY_MODEL, this.state.input)
+		fetch('http://localhost:3000/imageurl', {
+			method: 'post',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				input: this.state.input
+			})
+		})
+			.then((response) => response.json())
 			.then((response) => {
 				if (response) {
 					fetch('http://localhost:3000/image', {
@@ -134,7 +137,7 @@ class App extends Component {
 
 	onRouteChange = (route) => {
 		if (route === 'signout') {
-			this.setState({ isSignedIn: false });
+			this.setState(initialState);
 		} else if (route === 'home') {
 			this.setState({ isSignedIn: true });
 		}
