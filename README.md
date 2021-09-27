@@ -1,10 +1,10 @@
-# Smartbrain
+# [Smartbrain](https://yasumitsu.github.io/smartbrain/)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Tech stack
 
-React, ParticlesJs, Tachyons, React-tilt
+React, ParticlesJs, Tachyons, React-tilt, Clarifai
 
 ## Available Scripts
 
