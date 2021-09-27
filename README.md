@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Tech stack
 
-React, ParticlesJs, Tachyons, React-tilt, Clarifai
+React, ParticlesJs, Tachyons, React-tilt, Clarifai, Express, Heroku
 
 ## Available Scripts
 
